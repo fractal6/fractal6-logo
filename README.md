@@ -1,6 +1,6 @@
 # Fractal Logo
 
-Generate fractal image automatically direclty from a fractal's equation.
+Generate fractal images directly from fractal equations.
 
 ### Install
 

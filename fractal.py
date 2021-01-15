@@ -3,7 +3,7 @@
 """fractal generation.
 
 Usage:
-  fractal.py [-t T] [-k K] [-c C] [-e E] [--theta O] [--space S] [--rayon R] [--exp EXP] [--write]
+  fractal.py [-t T] [-k K] [-c C] [-e E] [--theta O] [--space S] [--rayon R] [--exp EXP] [--write] [--format F]
 
 Options:
   -h --help         Show this screen.
@@ -14,10 +14,12 @@ Options:
   -s, --space S     Space time [default: lin].
   -c, --category C  piral category [default: quad].
   -r, --rayon R     Rayon factor for svg [default: 1].
-  --exp N     Rayon factor for svg [default: 1].
-  -w, --write       Write to svg file
+  --exp N           Rayon factor for svg [default: 1].
+  -w, --write       Write to fil
+  -f, --format F    Choose output format (svg or elm) [default: svg]
 
 Examples:
+ ./fractal.py -t 25 -k 2 -c log  -w
  ./fractal.py -t 10 -k 2 -e 1.666 -s log -r 1
  ./fractal.py -t 18 -k 4 -s log -o 4.1 -c log -r 1 -w
  ./fractal.py -t 19 -k 4 -s log -o 4.3 -c log --rayon 1.2 --exp 0.9 -w
@@ -28,6 +30,7 @@ Examples:
 
 """
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from docopt import docopt
@@ -63,7 +66,6 @@ class Spiral:
 
 
 def generate_circles_html(tt, xx, yy, r=1, exp=1):
-
     circles = []
     for t, x, y in zip(tt, xx, yy):
         circle = '<circle cx="{x}" cy="{y}" r="{r}"/>'.format(x=x, y=y, r=(t*r)**exp)
@@ -74,7 +76,6 @@ def generate_circles_html(tt, xx, yy, r=1, exp=1):
 
 
 def generate_circles_elm(tt, xx, yy, r=1, exp=1):
-
     circles = []
     for t, x, y in zip(tt, xx, yy):
         circle = 'circle [cx "{x}", cy "{y}", r "{r}"] []'.format(x=x, y=y, r=(t*r)**exp)
@@ -170,14 +171,17 @@ if __name__ == '__main__':
                     maxX=maxX, maxY=maxY)
 
     if args['--write']:
-        fn = "fractal.svg"
+        os.makedirs("out/", exist_ok=True)
+        if args['--format'] == "svg":
+            fn = "out/fractal.svg"
+            out = svg_html
+        elif args['--format'] == "elm":
+            fn = "out/fractal.elm"
+            out = svg_elm
+
         print("writing %s" % fn)
         with open(fn, 'w') as _f:
-            _f.write(svg_html)
-
-        fn = "fractal.elm"
-        with open(fn, 'w') as _f:
-            _f.write(svg_elm)
+            _f.write(out)
     else:
         plt.scatter(x, y)
         plt.scatter(x1, y1)
