@@ -27,6 +27,8 @@ Examples:
  ./fractal.py -t 42 -k 4 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # fractal2
  ./fractal.py -t 75 -k 5 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # fractal3
  ./fractal.py -t 50 -k 5 -s log -o 4.05 -c log --rayon 1.2 --exp 0.95 -w # fractal4
+ ./fractal.py -t 42 -k 3.5 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # v0.1 - v0.4
+ ./fractal.py -t 90 -k 3.5 -s log -o 5 -c log --rayon 0.8 --exp 1 -w # v0.5
 
 """
 
@@ -102,6 +104,15 @@ if __name__ == '__main__':
 
     t, x, y = spiralfun(T=T, k=K, e=e, theta=theta, space=space)
 
+    ## Rotate
+    theta = 45
+    rad = 2*np.pi*theta/360
+    for i, v in enumerate(zip(x, y)):
+        x_i = -(x[i]*np.cos(rad) - y[i]*np.sin(rad))
+        y_i = -(x[i]*np.sin(rad) + y[i]*np.cos(rad))
+        x[i] = x_i
+        y[i] = y_i
+
     # Translate
     x1 = x - 2*(x - x[0]) + 0.000125
     y1 = y - 2*(y - y[0]) - 0.0001
@@ -134,54 +145,90 @@ if __name__ == '__main__':
     minX = np.min([x.min(), x1.min()])
     minY = np.min([y.min(), y1.min()])
     maxR = (t.max()*rayon)**exp
-    x -= minX - maxR*0.995
+    x  -= minX - maxR*0.995
     x1 -= minX - maxR*0.995
-    y -= minY - maxR*0.995
+    y  -= minY - maxR*0.995
     y1 -= minY - maxR*0.995
+
+    maxX = (np.max([x.max(), x1.max()]) + maxR)
+    maxY = (np.max([y.max(), y1.max()]) + maxR)
+
+    # Shif to fit the circle
+    # for circle background
+    #backR = 0.99*maxX/2*1.25
+    #shiftX = (backR - maxX/2)
+    #shiftY = (backR - maxY/2)
+    #x  += shiftX
+    #x1 += shiftX
+    #y  += shiftY
+    #y1 += shiftY
 
     circles_html = generate_circles_html(t, x, y, r=rayon, exp=exp)
     circles2_html = generate_circles_html(t, x1, y1, r=rayon, exp=exp)
     circles_elm = generate_circles_elm(t, x, y, r=rayon, exp=exp)
     circles2_elm = generate_circles_elm(t, x1, y1, r=rayon, exp=exp)
 
-    maxX = (np.max([x.max(), x1.max()]) + maxR)*1.005
-    maxY = (np.max([y.max(), y1.max()]) + maxR)*1.005
+
+    # Circle background
+    background = ''
+    #background = '<circle cx="{CX}" cy="{CY}" r="{R}" fill="#333" />'.format(
+    #    CX=maxX/2+shiftX, CY=maxY/2+shiftY, R=backR
+    #)
+    # Rectangle background
+    #background = '<rect x="0" y="0" width="{maxX}" height="{maxY}" fill="#333" />'
 
     #<circle cx="{CX}" cy="{CY}" r="{R}" fill="#333" style="stroke:white;stroke-width:3" />
     svg_html = """<?xml version="1.0" standalone="no"?>
-		<svg xmlns="http://www.w3.org/2000/svg" viewPort="0 0 {maxX} {maxY}" fill="#fff">
-        <rect x="0" y="0" width="{maxX}" height="{maxY}" fill="#333" />
-		{circles}
-		{circles2}
-		</svg>""".format(circles=circles_html, circles2=circles2_html,
+    <svg xmlns="http://www.w3.org/2000/svg" viewPort="0 0 {maxX} {maxX}" fill="#fff">
+        {background}
+        {circles}
+        {circles2}
+     </svg>""".format(circles=circles_html, circles2=circles2_html,
+                   background=background,
                    maxX=maxX, maxY=maxY,
-                   CX=maxX/2, CY=maxY/2, R=0.99*maxX/2
+                  )
+
+    svg_inv_html = """<?xml version="1.0" standalone="no"?>
+    <svg xmlns="http://www.w3.org/2000/svg" viewPort="0 0 {maxX} {maxX}" fill="#000">
+        {background}
+        {circles}
+        {circles2}
+     </svg>""".format(circles=circles_html, circles2=circles2_html,
+                   background=background,
+                   maxX=maxX, maxY=maxY,
                   )
 
     svg_elm = """
-        svg [viewBox "0 0 {maxX} {maxY}"
-        , height "32"
-        , width "64"
+        svg [viewBox "0 0 {maxX} {maxX}"
+        , height "38"
+        , width "54"
         , fill "white"
         ]
         [
-		{circles}
-		,{circles2}
+           {circles}
+          ,{circles2}
         ]""".format(circles=circles_elm, circles2=circles2_elm,
                     maxX=maxX, maxY=maxY)
 
     if args['--write']:
         os.makedirs("out/", exist_ok=True)
         if args['--format'] == "svg":
-            fn = "out/fractal.svg"
+            fn = "out/fractale.svg"
             out = svg_html
+            print("writing %s" % fn)
+            with open(fn, 'w') as _f:
+                _f.write(out)
+            fn = "out/fractale_inv.svg"
+            out = svg_inv_html
+            print("writing %s" % fn)
+            with open(fn, 'w') as _f:
+                _f.write(out)
         elif args['--format'] == "elm":
-            fn = "out/fractal.elm"
+            fn = "out/fractale.elm"
             out = svg_elm
-
-        print("writing %s" % fn)
-        with open(fn, 'w') as _f:
-            _f.write(out)
+            print("writing %s" % fn)
+            with open(fn, 'w') as _f:
+                _f.write(out)
     else:
         plt.scatter(x, y)
         plt.scatter(x1, y1)
