@@ -1,7 +1,6 @@
 version := v1
-logo := fractale_inv
-
 path = img/$(version)
+logo := fractale-inv
 
 default: logo
 
