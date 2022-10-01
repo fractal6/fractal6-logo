@@ -27,6 +27,7 @@ Examples:
  ./fractal.py -t 42 -k 4 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # fractal2
  ./fractal.py -t 75 -k 5 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # fractal3
  ./fractal.py -t 50 -k 5 -s log -o 4.05 -c log --rayon 1.2 --exp 0.95 -w # fractal4
+ ./fractal.py -t 42 -k 5 -s log -o 4.11 -c log --rayon 1.9 --exp 0.9 -w # fractale_about
  ./fractal.py -t 42 -k 3.5 -s log -o 4.05 -c log --rayon 1 --exp 0.9 -w # v0.1 - v0.4
  ./fractal.py -t 90 -k 3.5 -s log -o 5 -c log --rayon 0.8 --exp 1 -w # v0.5
 
