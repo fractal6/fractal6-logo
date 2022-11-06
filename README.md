@@ -1,6 +1,6 @@
-# Fractal Logo
+# Fractale Logo
 
-Generate fractal images directly from fractal equations.
+Generate fractal images directly from fractal equations (yes, I wasn't born a designer :smirk:).
 
 ### Install
 
@@ -8,5 +8,5 @@ Generate fractal images directly from fractal equations.
 
 ### Help
 
-`python3 fractal.py --help`
+    python3 fractal.py --help
 
